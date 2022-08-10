@@ -1,6 +1,6 @@
 # chat-room-api
 
-This project represents a backend for the chatroom app which includes functionalities like:
+This project represents a backend for a chatroom app which includes functionalities like:
 
 - creating a new room,
 - joining a room
