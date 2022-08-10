@@ -37,6 +37,15 @@ wss.on("connection", function (socket, message) {
     }
 
     if (data.roomName && data.pswd) {
+      if (
+        !/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#!@$^-]).{8,15}$/.test(
+          data.pswd
+        )
+      ) {
+        user.socket.send(JSON.stringify({ err: 400, message: "Bad Request" }));
+        return;
+      }
+
       data.isCreation && (await createRoom(data));
       joinRoom(user, data);
     }
