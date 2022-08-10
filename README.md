@@ -2,10 +2,10 @@
 
 This project represents a backend for a chatroom app which includes functionalities like:
 
-- creating a new room,
+- creating a new room
 - joining a room
-- sending a message
 - getting the chat history on entry in a chat room
+- sending a message
 - hashing the passwords
 - quitting a room
 
