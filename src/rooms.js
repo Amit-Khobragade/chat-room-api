@@ -51,7 +51,7 @@ function createUser(socket, userName) {
 async function createRoom({ roomName, pswd }) {
   const room = new roomModel({
     room_name: roomName,
-    room_password: hash(pswd),
+    room_password: pswd,
   });
   await room.save();
 }
@@ -62,10 +62,12 @@ async function createRoom({ roomName, pswd }) {
  * @returns {string}
  */
 function hash(pswd) {
-  const salt = crypto.createHash("sha256").update(pswd).digest().toString();
-  return Buffer.from(
-    crypto.hkdfSync("sha512", "key", salt, pswd, 216)
-  ).toString();
+  return crypto
+    .createHash("sha256")
+    .update(pswd)
+    .update(process.env.SALT)
+    .digest()
+    .toString();
 }
 
 /**
@@ -103,7 +105,7 @@ async function sendMessage(user, { roomId, message }) {
  */
 async function joinRoom(user, { roomName, pswd }) {
   let room = await roomModel
-    .findOne({ room_name: roomName, room_password: hash(pswd) })
+    .findOne({ room_name: roomName, room_password: pswd })
     .exec();
 
   // * -- check if rooom exists
@@ -166,4 +168,5 @@ module.exports = {
   joinRoom,
   quitRoom,
   sendMessage,
+  hash,
 };
