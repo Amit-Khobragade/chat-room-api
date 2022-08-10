@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { roomModel, messageModel } = require("./db");
 const ws = require("ws");
+const crypto = require("node:crypto");
 
 /**
  * @typedef {Object} User
@@ -50,9 +51,21 @@ function createUser(socket, userName) {
 async function createRoom({ roomName, pswd }) {
   const room = new roomModel({
     room_name: roomName,
-    room_password: pswd,
+    room_password: hash(pswd),
   });
   await room.save();
+}
+
+/**
+ *
+ * @param {string} pswd
+ * @returns {string}
+ */
+function hash(pswd) {
+  const salt = crypto.createHash("sha256").update(pswd).digest().toString();
+  return Buffer.from(
+    crypto.hkdfSync("sha512", "key", salt, pswd, 216)
+  ).toString();
 }
 
 /**
@@ -90,7 +103,7 @@ async function sendMessage(user, { roomId, message }) {
  */
 async function joinRoom(user, { roomName, pswd }) {
   let room = await roomModel
-    .findOne({ room_name: roomName, room_password: pswd })
+    .findOne({ room_name: roomName, room_password: hash(pswd) })
     .exec();
 
   // * -- check if rooom exists
