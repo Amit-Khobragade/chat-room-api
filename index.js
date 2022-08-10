@@ -8,6 +8,7 @@ const {
   joinRoom,
   quitRoom,
   sendMessage,
+  hash,
 } = require("./src/rooms");
 
 const server = http.createServer(app);
@@ -45,6 +46,8 @@ wss.on("connection", function (socket, message) {
         user.socket.send(JSON.stringify({ err: 400, message: "Bad Request" }));
         return;
       }
+
+      data.pswd = hash(data.pswd);
 
       data.isCreation && (await createRoom(data));
       joinRoom(user, data);
